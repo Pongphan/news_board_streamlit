@@ -36,6 +36,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "student": "Student",
         "read_source": "Open source",
         "add_content": "Add content",
+        "admin": "Admin",
+        "dashboard": "News board",
         "content_saved": "Content saved. The board is now up to date.",
         "database_error": "The data service is temporarily unavailable. Please try again.",
         "back_dashboard": "Back to news board",
@@ -64,6 +66,42 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "invalid_source_uri": "Enter a valid URL beginning with http:// or https://.",
         "unknown_time": "Time unavailable",
         "footer": "Academic News Board · Every briefing links to its original source.",
+        "admin_login_eyebrow": "Restricted access",
+        "admin_login_title": "Administrator sign-in",
+        "admin_login_intro": "Authenticate to review complete submission data and moderate the public board.",
+        "admin_password": "Administrator password",
+        "admin_password_placeholder": "Enter password",
+        "admin_sign_in": "Sign in",
+        "admin_invalid_password": "Authentication failed. Verify the password and try again.",
+        "admin_eyebrow": "Moderation workspace",
+        "admin_title": "Content administration",
+        "admin_intro": "Review complete identifiers, validate sources, export records, and moderate public visibility.",
+        "admin_logout": "Sign out",
+        "filter_status": "Visibility status",
+        "all_statuses": "All statuses",
+        "status_published": "Published",
+        "status_hidden": "Hidden",
+        "admin_search": "Search records",
+        "admin_search_placeholder": "Student ID, summary, or source URL",
+        "admin_metric_total": "All records",
+        "admin_metric_published": "Published",
+        "admin_metric_hidden": "Hidden",
+        "download_csv": "Download CSV",
+        "admin_empty": "No records match the selected criteria.",
+        "full_student_id": "Full Student ID",
+        "created_at": "Submitted",
+        "moderated_at": "Last moderated",
+        "not_moderated": "Not moderated",
+        "hide_item": "Hide",
+        "restore_item": "Publish",
+        "delete_item": "Delete",
+        "confirm_delete": "Permanently delete this record? This action cannot be undone.",
+        "confirm_delete_action": "Confirm delete",
+        "cancel": "Cancel",
+        "item_hidden": "The record is hidden from the public board.",
+        "item_restored": "The record is published on the public board.",
+        "item_deleted": "The record has been permanently deleted.",
+        "action_failed": "The record could not be updated. It may have already changed.",
     },
     "th": {
         "brand_name": "บอร์ดข่าววิชาการ",
@@ -90,6 +128,8 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "student": "นักศึกษา",
         "read_source": "เปิดแหล่งข้อมูล",
         "add_content": "เพิ่มเนื้อหา",
+        "admin": "ผู้ดูแล",
+        "dashboard": "บอร์ดข่าว",
         "content_saved": "บันทึกเนื้อหาแล้ว และปรับปรุงบอร์ดให้เป็นปัจจุบันเรียบร้อย",
         "database_error": "ระบบข้อมูลไม่พร้อมใช้งานชั่วคราว กรุณาลองอีกครั้ง",
         "back_dashboard": "กลับสู่บอร์ดข่าว",
@@ -118,6 +158,42 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "invalid_source_uri": "กรุณากรอก URL ที่ขึ้นต้นด้วย http:// หรือ https://",
         "unknown_time": "ไม่ทราบเวลา",
         "footer": "บอร์ดข่าววิชาการ · ทุกบทสรุปเชื่อมโยงแหล่งข้อมูลต้นทาง",
+        "admin_login_eyebrow": "พื้นที่จำกัดสิทธิ์",
+        "admin_login_title": "เข้าสู่ระบบผู้ดูแล",
+        "admin_login_intro": "ยืนยันตัวตนเพื่อตรวจสอบข้อมูลฉบับเต็มและบริหารเนื้อหาบนบอร์ดสาธารณะ",
+        "admin_password": "รหัสผ่านผู้ดูแล",
+        "admin_password_placeholder": "กรอกรหัสผ่าน",
+        "admin_sign_in": "เข้าสู่ระบบ",
+        "admin_invalid_password": "ยืนยันตัวตนไม่สำเร็จ กรุณาตรวจสอบรหัสผ่านแล้วลองอีกครั้ง",
+        "admin_eyebrow": "พื้นที่กลั่นกรองเนื้อหา",
+        "admin_title": "จัดการข้อมูลข่าว",
+        "admin_intro": "ตรวจสอบรหัสนักศึกษาฉบับเต็ม แหล่งข้อมูล ส่งออกระเบียน และกำหนดการแสดงผลสาธารณะ",
+        "admin_logout": "ออกจากระบบ",
+        "filter_status": "สถานะการแสดงผล",
+        "all_statuses": "ทุกสถานะ",
+        "status_published": "เผยแพร่",
+        "status_hidden": "ซ่อน",
+        "admin_search": "ค้นหาระเบียน",
+        "admin_search_placeholder": "รหัสนักศึกษา บทสรุป หรือ URL ต้นทาง",
+        "admin_metric_total": "ระเบียนทั้งหมด",
+        "admin_metric_published": "เผยแพร่",
+        "admin_metric_hidden": "ซ่อน",
+        "download_csv": "ดาวน์โหลด CSV",
+        "admin_empty": "ไม่พบระเบียนที่ตรงกับเงื่อนไข",
+        "full_student_id": "รหัสนักศึกษาฉบับเต็ม",
+        "created_at": "เวลาส่งข้อมูล",
+        "moderated_at": "กลั่นกรองล่าสุด",
+        "not_moderated": "ยังไม่ผ่านการกลั่นกรอง",
+        "hide_item": "ซ่อน",
+        "restore_item": "เผยแพร่",
+        "delete_item": "ลบ",
+        "confirm_delete": "ยืนยันการลบระเบียนนี้อย่างถาวร การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+        "confirm_delete_action": "ยืนยันการลบ",
+        "cancel": "ยกเลิก",
+        "item_hidden": "ซ่อนระเบียนจากบอร์ดสาธารณะแล้ว",
+        "item_restored": "เผยแพร่ระเบียนบนบอร์ดสาธารณะแล้ว",
+        "item_deleted": "ลบระเบียนอย่างถาวรแล้ว",
+        "action_failed": "ไม่สามารถปรับปรุงระเบียนได้ ข้อมูลอาจมีการเปลี่ยนแปลงแล้ว",
     },
 }
 
@@ -245,6 +321,13 @@ def configure_page(page_title: str) -> None:
         .brand-tagline { color: var(--muted); font-size: .72rem; }
         .st-key-language_switcher [data-testid="stSegmentedControl"] { justify-content: flex-end; }
         .st-key-language_switcher button { min-height: 2.35rem; font-weight: 800; }
+        .st-key-top_page_action button {
+            min-height: 2.35rem;
+            border-color: var(--line);
+            color: var(--ink);
+            background: var(--glass);
+            font-weight: 750;
+        }
         .hero {
             position: relative;
             isolation: isolate;
@@ -418,6 +501,45 @@ def configure_page(page_title: str) -> None:
             box-shadow: 0 18px 48px rgba(42, 47, 89, .08);
             backdrop-filter: blur(20px) saturate(125%);
         }
+        .admin-login {
+            max-width: 760px;
+            padding: clamp(1.6rem, 5vw, 3.1rem);
+            margin: 2.2rem auto 1.2rem;
+            border: 1px solid var(--line);
+            border-radius: 1.7rem;
+            background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(24px) saturate(125%);
+        }
+        .admin-login h1, .admin-header h1 {
+            margin: .15rem 0 .55rem;
+            color: var(--ink);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            letter-spacing: -.055em;
+        }
+        .admin-login p, .admin-header p { margin: 0; color: var(--muted); line-height: 1.7; }
+        .admin-header { padding: 1.2rem 0 .8rem; }
+        [class*="st-key-admin_record_"] [data-testid="stVerticalBlockBorderWrapper"] {
+            border-color: var(--line);
+            border-radius: 1.25rem;
+            background: var(--glass);
+            box-shadow: 0 12px 34px rgba(46, 51, 94, .07);
+            backdrop-filter: blur(18px) saturate(125%);
+        }
+        .status-pill {
+            display: inline-flex;
+            padding: .32rem .65rem;
+            border-radius: 999px;
+            font-size: .7rem;
+            font-weight: 850;
+            letter-spacing: .03em;
+        }
+        .status-published { color: #25634f; background: rgba(134, 219, 184, .24); }
+        .status-hidden { color: #7c4d25; background: rgba(245, 190, 132, .25); }
+        @media (prefers-color-scheme: dark) {
+            .status-published { color: #a4e7ce; }
+            .status-hidden { color: #f2c797; }
+        }
         .stButton > button, .stLinkButton > a { border-radius: .82rem; font-weight: 750; }
         .st-key-floating_add_content {
             position: fixed;
@@ -450,12 +572,14 @@ def configure_page(page_title: str) -> None:
             .block-container { padding: .75rem .8rem 6.5rem; }
             .st-key-top_navigation { padding: .45rem .5rem; border-radius: 1rem; }
             .st-key-top_navigation [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: .35rem; }
-            .st-key-top_navigation [data-testid="stColumn"]:first-child { width: 66%; flex: 1 1 66%; }
-            .st-key-top_navigation [data-testid="stColumn"]:last-child { width: 34%; flex: 0 0 34%; }
+            .st-key-top_navigation [data-testid="stColumn"]:first-child { width: 52%; flex: 1 1 52%; }
+            .st-key-top_navigation [data-testid="stColumn"]:nth-child(2) { width: 23%; flex: 0 0 23%; }
+            .st-key-top_navigation [data-testid="stColumn"]:last-child { width: 25%; flex: 0 0 25%; }
             .brand-mark { width: 2.15rem; height: 2.15rem; border-radius: .72rem; }
             .brand-name { font-size: .84rem; }
             .brand-tagline { display: none; }
             .st-key-language_switcher button { min-height: 2.1rem; padding-inline: .52rem; }
+            .st-key-top_page_action button { min-height: 2.1rem; padding-inline: .55rem; font-size: .74rem; }
             .hero { min-height: 360px; padding: 2rem 1.3rem; border-radius: 1.45rem; }
             .hero h1 { font-size: clamp(2.45rem, 13vw, 3.7rem); }
             .hero::before { background-size: 56px 56px; }
@@ -480,12 +604,14 @@ def current_language() -> str:
     return str(st.session_state.get("ui_language", "EN")).lower()
 
 
-def render_top_navigation() -> str:
+def render_top_navigation(destination: str = "admin") -> str:
     """Render the glass navigation bar and persistent EN/TH control."""
 
     language = current_language()
     with st.container(key="top_navigation"):
-        brand_column, language_column = st.columns([4.4, 1], vertical_alignment="center")
+        brand_column, action_column, language_column = st.columns(
+            [4.1, 1, 1], vertical_alignment="center"
+        )
         with brand_column:
             st.markdown(
                 f"""
@@ -499,6 +625,18 @@ def render_top_navigation() -> str:
                 """,
                 unsafe_allow_html=True,
             )
+        with action_column:
+            with st.container(key="top_page_action"):
+                action_key = "dashboard" if destination == "dashboard" else "admin"
+                action_icon = ":material/home:" if destination == "dashboard" else ":material/admin_panel_settings:"
+                if st.button(
+                    text(language, action_key),
+                    icon=action_icon,
+                    key=f"open_{destination}_page",
+                    width="stretch",
+                ):
+                    target = "app.py" if destination == "dashboard" else "pages/admin.py"
+                    st.switch_page(target)
         with language_column:
             with st.container(key="language_switcher"):
                 selected = st.segmented_control(

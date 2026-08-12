@@ -39,3 +39,21 @@ def test_add_content_page_starts_without_exception(monkeypatch, tmp_path):
     assert app.selectbox[0].label == "Section *"
     assert app.text_input[0].label == "Student ID *"
     assert app.text_area[0].label == "News Summary *"
+
+
+def test_admin_requires_password_and_opens_with_requested_password(monkeypatch, tmp_path):
+    import database
+
+    monkeypatch.setattr(database, "DEFAULT_DATABASE_PATH", tmp_path / "admin-smoke.db")
+    app = AppTest.from_file(PROJECT_DIR / "pages" / "admin.py", default_timeout=10)
+    app.run()
+
+    assert not app.exception
+    assert app.text_input[0].label == "Administrator password"
+    assert not app.metric
+
+    app.text_input[0].set_value("isai12admin")
+    next(button for button in app.button if button.label == "Sign in").click().run()
+
+    assert not app.exception
+    assert [metric.label for metric in app.metric] == ["All records", "Published", "Hidden"]

@@ -12,6 +12,7 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent
 DEFAULT_DATABASE_PATH = PROJECT_DIR / "data" / "news_board.db"
 ALLOWED_SECTIONS = ("Section 1", "Section 2", "Section 3")
+NEWS_STATUSES = ("published", "hidden")
 
 
 class DatabaseError(RuntimeError):
@@ -28,6 +29,8 @@ class NewsItem:
     news_summary: str
     source_uri: str
     created_at: str
+    status: str
+    moderated_at: str | None
 
 
 def _database_path(database_path: str | Path | None = None) -> Path:
@@ -55,7 +58,7 @@ def _connect(database_path: str | Path | None = None) -> sqlite3.Connection:
 
 
 def initialize_database(database_path: str | Path | None = None) -> None:
-    """Create the schema and indexes when the application starts."""
+    """Create the schema and migrate existing databases without data loss."""
 
     schema = """
         CREATE TABLE IF NOT EXISTS news (
@@ -67,7 +70,10 @@ def initialize_database(database_path: str | Path | None = None) -> None:
             news_summary TEXT NOT NULL
                 CHECK (length(news_summary) BETWEEN 10 AND 2000),
             source_uri TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'published'
+                CHECK (status IN ('published', 'hidden')),
+            moderated_at TEXT
         );
 
         CREATE INDEX IF NOT EXISTS idx_news_created_at
@@ -78,6 +84,24 @@ def initialize_database(database_path: str | Path | None = None) -> None:
     try:
         with closing(_connect(database_path)) as connection:
             connection.executescript(schema)
+            columns = {
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(news)").fetchall()
+            }
+            # SQLite supports adding these nullable/defaulted columns in place,
+            # so records created by earlier app versions remain intact.
+            if "status" not in columns:
+                connection.execute(
+                    """
+                    ALTER TABLE news ADD COLUMN status TEXT NOT NULL DEFAULT 'published'
+                    CHECK (status IN ('published', 'hidden'))
+                    """
+                )
+            if "moderated_at" not in columns:
+                connection.execute("ALTER TABLE news ADD COLUMN moderated_at TEXT")
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_news_status ON news(status, created_at DESC)"
+            )
             connection.commit()
     except (sqlite3.Error, OSError) as exc:
         raise DatabaseError("ไม่สามารถเตรียมฐานข้อมูลได้") from exc
@@ -115,9 +139,9 @@ def list_news(
     section: str | None = None,
     keyword: str = "",
 ) -> list[NewsItem]:
-    """Return newest items first, with optional server-side filtering."""
+    """Return published items newest first, with optional filtering."""
 
-    clauses: list[str] = []
+    clauses: list[str] = ["status = 'published'"]
     parameters: list[str] = []
 
     if section in ALLOWED_SECTIONS:
@@ -132,7 +156,8 @@ def list_news(
 
     where_clause = f" WHERE {' AND '.join(clauses)}" if clauses else ""
     statement = f"""
-        SELECT id, section, student_id, news_summary, source_uri, created_at
+        SELECT id, section, student_id, news_summary, source_uri, created_at,
+               status, moderated_at
         FROM news
         {where_clause}
         ORDER BY created_at DESC, id DESC
@@ -147,13 +172,116 @@ def list_news(
     return [NewsItem(**dict(row)) for row in rows]
 
 
-def count_news(database_path: str | Path | None = None) -> tuple[int, int]:
-    """Return total item count and the number of represented sections."""
+def list_news_for_admin(
+    database_path: str | Path | None = None,
+    *,
+    section: str | None = None,
+    status: str | None = None,
+    keyword: str = "",
+) -> list[NewsItem]:
+    """Return administrative records, including hidden items and full IDs."""
 
-    statement = "SELECT COUNT(*) AS total, COUNT(DISTINCT section) AS sections FROM news"
+    clauses: list[str] = []
+    parameters: list[str] = []
+
+    if section in ALLOWED_SECTIONS:
+        clauses.append("section = ?")
+        parameters.append(section)
+    if status in NEWS_STATUSES:
+        clauses.append("status = ?")
+        parameters.append(status)
+    if keyword.strip():
+        escaped = (
+            keyword.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        )
+        pattern = f"%{escaped}%"
+        clauses.append(
+            """
+            (news_summary LIKE ? ESCAPE '\\'
+             OR student_id LIKE ? ESCAPE '\\'
+             OR source_uri LIKE ? ESCAPE '\\')
+            """
+        )
+        parameters.extend((pattern, pattern, pattern))
+
+    where_clause = f" WHERE {' AND '.join(clauses)}" if clauses else ""
+    statement = f"""
+        SELECT id, section, student_id, news_summary, source_uri, created_at,
+               status, moderated_at
+        FROM news
+        {where_clause}
+        ORDER BY created_at DESC, id DESC
+    """
+    try:
+        with closing(_connect(database_path)) as connection:
+            rows = connection.execute(statement, parameters).fetchall()
+    except (sqlite3.Error, OSError) as exc:
+        raise DatabaseError("Could not read administrative news data") from exc
+    return [NewsItem(**dict(row)) for row in rows]
+
+
+def update_news_status(
+    news_id: int,
+    status: str,
+    database_path: str | Path | None = None,
+) -> bool:
+    """Publish or hide one item and return whether a record changed."""
+
+    if status not in NEWS_STATUSES:
+        raise ValueError(f"Unsupported news status: {status}")
+    moderated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    try:
+        with closing(_connect(database_path)) as connection:
+            cursor = connection.execute(
+                "UPDATE news SET status = ?, moderated_at = ? WHERE id = ?",
+                (status, moderated_at, int(news_id)),
+            )
+            connection.commit()
+            return cursor.rowcount == 1
+    except (sqlite3.Error, OSError) as exc:
+        raise DatabaseError("Could not update the news status") from exc
+
+
+def delete_news(news_id: int, database_path: str | Path | None = None) -> bool:
+    """Permanently delete one item and return whether a record changed."""
+
+    try:
+        with closing(_connect(database_path)) as connection:
+            cursor = connection.execute("DELETE FROM news WHERE id = ?", (int(news_id),))
+            connection.commit()
+            return cursor.rowcount == 1
+    except (sqlite3.Error, OSError) as exc:
+        raise DatabaseError("Could not delete the news item") from exc
+
+
+def count_news(database_path: str | Path | None = None) -> tuple[int, int]:
+    """Return public item count and number of represented public sections."""
+
+    statement = """
+        SELECT COUNT(*) AS total, COUNT(DISTINCT section) AS sections
+        FROM news WHERE status = 'published'
+    """
     try:
         with closing(_connect(database_path)) as connection:
             row = connection.execute(statement).fetchone()
     except (sqlite3.Error, OSError) as exc:
         raise DatabaseError("ไม่สามารถอ่านสถิติข่าวได้") from exc
     return int(row["total"]), int(row["sections"])
+
+
+def count_news_by_status(database_path: str | Path | None = None) -> tuple[int, int, int]:
+    """Return total, published, and hidden counts for the admin dashboard."""
+
+    statement = """
+        SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) AS published,
+            SUM(CASE WHEN status = 'hidden' THEN 1 ELSE 0 END) AS hidden
+        FROM news
+    """
+    try:
+        with closing(_connect(database_path)) as connection:
+            row = connection.execute(statement).fetchone()
+    except (sqlite3.Error, OSError) as exc:
+        raise DatabaseError("Could not read moderation statistics") from exc
+    return int(row["total"] or 0), int(row["published"] or 0), int(row["hidden"] or 0)
