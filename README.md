@@ -2,6 +2,8 @@
 
 เว็บแอปบอร์ดข่าวสาร 2 หน้า พัฒนาด้วย Streamlit และ SQLite พร้อม validation, automated tests และไฟล์สำหรับ deploy
 
+UI ใช้แนวทาง pastel glass-tech แบบ responsive รองรับ light/dark ตาม browser preference และสลับภาษา EN/TH จากมุมขวาบน โดยใช้ภาษาอังกฤษเป็นค่าเริ่มต้น
+
 ## Project Structure
 
 ```text
@@ -26,11 +28,12 @@ news_board_streamlit/
 
 ## การทำงานของแต่ละส่วน
 
-- `app.py` เรียก `initialize_database()` ทุกครั้งที่เริ่มแอป (คำสั่งเป็น idempotent), โหลดข่าวล่าสุด, ค้นหา/กรอง และแสดงการ์ด 2 คอลัมน์ ปุ่ม `เพิ่มเนื้อหา` ถูกตรึงไว้ที่มุมซ้ายล่างและเรียก `st.switch_page("pages/add_content.py")`
+- `app.py` เรียก `initialize_database()` ทุกครั้งที่เริ่มแอป (คำสั่งเป็น idempotent), โหลดข่าวล่าสุด, ค้นหา/กรอง และแสดงการ์ด 2 คอลัมน์ ปุ่มเพิ่มเนื้อหาถูกตรึงไว้ที่มุมซ้ายล่างและเรียก `st.switch_page("pages/add_content.py")`
 - `pages/add_content.py` รับ Section, Student ID, News Summary และ Source URI หลัง validation ผ่านจึง insert แบบ transaction จากนั้นล้าง `st.cache_data`, เก็บ success message ใน `st.session_state` และ `st.switch_page("app.py")` ทำให้ Dashboard โหลดข้อมูลใหม่อัตโนมัติ
 - `database.py` ใช้ parameterized SQL, `CHECK` constraints, UTC timestamp, WAL mode และ busy timeout ฐานข้อมูลอยู่ที่ `data/news_board.db`
-- `validation.py` อนุญาตเฉพาะ Section 1–3, Student ID 4–20 ตัว, summary 10–2,000 ตัว และ URL แบบ HTTP/HTTPS ที่มี hostname
-- `ui.py` รวม theme, responsive layout, helper ปกปิด Student ID บางส่วน และแปลงเวลา UTC เป็นเวลาไทย (UTC+7)
+- `validation.py` อนุญาตเฉพาะ Section 1–3, Student ID 4–20 ตัว, summary 10–2,000 ตัว และ URL แบบ HTTP/HTTPS ที่มี hostname โดยคืน message key สำหรับแสดงผลสองภาษา
+- `ui.py` รวมข้อความ EN/TH, language state, pastel glass-tech theme, responsive layout, helper ปกปิด Student ID บางส่วน และแปลงเวลา UTC เป็นเวลาไทย (UTC+7)
+- `.streamlit/config.toml` กำหนด palette แยก `[theme.light]` และ `[theme.dark]` เพื่อให้ Streamlitเลือกตาม browser/system theme อัตโนมัติ
 
 ## Local Setup
 

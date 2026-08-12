@@ -16,7 +16,14 @@ def test_dashboard_starts_without_exception(monkeypatch, tmp_path):
     app.run()
 
     assert not app.exception
-    assert app.selectbox[0].label == "กรองตาม Section"
+    assert app.segmented_control[0].value == "EN"
+    assert app.selectbox[0].label == "Section"
+    assert any(button.label == "Add content" for button in app.button)
+
+    app.segmented_control[0].set_value("TH").run()
+    assert not app.exception
+    assert app.selectbox[0].label == "Section"
+    assert app.text_input[0].label == "ค้นหาในบทสรุป"
     assert any(button.label == "เพิ่มเนื้อหา" for button in app.button)
 
 
@@ -28,6 +35,7 @@ def test_add_content_page_starts_without_exception(monkeypatch, tmp_path):
     app.run()
 
     assert not app.exception
+    assert app.segmented_control[0].value == "EN"
     assert app.selectbox[0].label == "Section *"
     assert app.text_input[0].label == "Student ID *"
     assert app.text_area[0].label == "News Summary *"

@@ -38,8 +38,8 @@ def validate_news(
 ) -> tuple[dict[str, str], dict[str, str]]:
     """Validate and normalize form input.
 
-    The first result maps field names to Thai error messages. The second result
-    is safe to pass directly to ``database.create_news`` when there are no errors.
+    The first result maps field names to language-independent message keys. The
+    second result is safe to pass to ``database.create_news`` when no errors exist.
     """
 
     cleaned = {
@@ -51,17 +51,15 @@ def validate_news(
     errors: dict[str, str] = {}
 
     if cleaned["section"] not in ALLOWED_SECTIONS:
-        errors["section"] = "กรุณาเลือก Section ที่ถูกต้อง"
+        errors["section"] = "invalid_section"
     if not STUDENT_ID_PATTERN.fullmatch(cleaned["student_id"]):
-        errors["student_id"] = (
-            "รหัสนักศึกษาต้องมี 4–20 ตัว และใช้ได้เฉพาะตัวอักษร ตัวเลข _ หรือ -"
-        )
+        errors["student_id"] = "invalid_student_id"
     summary_length = len(cleaned["news_summary"])
     if summary_length < 10:
-        errors["news_summary"] = "สรุปข่าวต้องมีอย่างน้อย 10 ตัวอักษร"
+        errors["news_summary"] = "summary_too_short"
     elif summary_length > 2000:
-        errors["news_summary"] = "สรุปข่าวต้องไม่เกิน 2,000 ตัวอักษร"
+        errors["news_summary"] = "summary_too_long"
     if not cleaned["source_uri"]:
-        errors["source_uri"] = "กรุณากรอก URL ที่ขึ้นต้นด้วย http:// หรือ https://"
+        errors["source_uri"] = "invalid_source_uri"
 
     return errors, cleaned
